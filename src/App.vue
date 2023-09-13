@@ -1,11 +1,9 @@
 <template>
   <div class="App">
-    <List />
+    <router-view></router-view>
   </div>
 </template>
 
-<script setup lang="ts">
-import List from "./pages/List.vue";
-</script>
+<script setup lang="ts"></script>
 
 <style scoped lang="less"></style>

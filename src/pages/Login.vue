@@ -31,13 +31,12 @@
 <script setup lang="ts">
 import { useRouter } from "vue-router";
 import { reactive, ref } from "vue";
-import CryptoJS from "crypto-js";
 
 const router = useRouter();
 
 const userInfo = reactive({
   username: localStorage.getItem("USERNAME") || "",
-  password: decrypt() || "",
+  password: localStorage.getItem("PASSWORD") || "",
 });
 
 let isRemember = ref(true);
@@ -50,7 +49,8 @@ function register() {
 function submit() {
   if (isRemember.value) {
     // 选择记住密码，将账号密码存储到localStorage中
-    encryptAndStorePassword(userInfo.password);
+    localStorage.setItem("USERNAME", userInfo.username);
+    localStorage.setItem("PASSWORD", userInfo.password);
   } else {
     localStorage.removeItem("USERNAME");
     localStorage.removeItem("PASSWORD");
@@ -58,22 +58,22 @@ function submit() {
 }
 
 // 将密码加密并存储到local
-function encryptAndStorePassword(password: string) {
-  const key = "ycjqyj";
-  const encryptedPassword = CryptoJS.AES.encrypt(password, key).toString();
-  localStorage.setItem("USERNAME", userInfo.username);
-  localStorage.setItem("PASSWORD", encryptedPassword);
-}
+// function encryptAndStorePassword(password: string) {
+//   const key = "ycjqyj";
+//   const encryptedPassword = CryptoJS.AES.encrypt(password, key).toString();
+//   localStorage.setItem("USERNAME", userInfo.username);
+//   localStorage.setItem("PASSWORD", encryptedPassword);
+// }
 
 // 解密密码
-function decrypt() {
-  const key = "ycjqyj"; // 用于解密的秘钥，必须保密
-  const encryptedPassword = localStorage.getItem("PASSWORD");
+// function decrypt() {
+//   const key = "ycjqyj"; // 用于解密的秘钥，必须保密
+//   const encryptedPassword = localStorage.getItem("PASSWORD");
 
-  const decryptedBytes = CryptoJS.AES.decrypt(encryptedPassword, key);
-  const decryptedPassword = decryptedBytes.toString(CryptoJS.enc.Utf8);
-  return decryptedPassword;
-}
+//   const decryptedBytes = CryptoJS.AES.decrypt(encryptedPassword, key);
+//   const decryptedPassword = decryptedBytes.toString(CryptoJS.enc.Utf8);
+//   return decryptedPassword;
+// }
 </script>
 
 <style scoped lang="less">

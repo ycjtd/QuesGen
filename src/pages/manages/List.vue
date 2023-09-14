@@ -27,7 +27,7 @@ watch(
   () => router.currentRoute.value.query.keyword,
   (newPath, oldPath) => {
     if (newPath !== oldPath) {
-      search(router.currentRoute.value.query.keyword);
+      search();
     }
   },
   { immediate: true }
@@ -68,8 +68,8 @@ const questionList = reactive([
   },
 ]);
 
-function search(val: string) {
-  console.log("触发搜索", val);
+function search() {
+  console.log("触发搜索");
 }
 </script>
 

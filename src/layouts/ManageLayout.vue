@@ -10,7 +10,7 @@
         <el-button
           :type="route.path === '/manage/list' ? 'default' : 'text'"
           class="btn"
-          @click="toMyQues(route.path)"
+          @click="toMyQues()"
         >
           <el-icon class="icon"><House /></el-icon>
           我的问卷</el-button
@@ -44,7 +44,7 @@ import { useRoute, useRouter } from "vue-router";
 const route = useRoute();
 const router = useRouter();
 
-function toMyQues(path) {
+function toMyQues() {
   router.push("/manage/list");
 }
 function toStar() {

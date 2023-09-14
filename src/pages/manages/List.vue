@@ -6,70 +6,59 @@
       </div>
       <div class="right"><ListSearch /></div>
     </div>
-    <div class="content">
-      <div v-for="item in questionList" :key="item._id">
+    <div class="content" v-loading="loading">
+      <div v-for="item in state.questionList" :key="item._id">
         <QuestionCard :list="item" />
       </div>
     </div>
-    <div class="footer">loadMore... 上划加载更多...</div>
+    <div class="footer" v-if="state.questionList.length">
+      loadMore... 上划加载更多...
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import QuestionCard from "../../components/QuestionCard.vue";
-import { reactive, watch } from "vue";
+import { reactive, watch, onMounted, ref } from "vue";
 import ListSearch from "../../components/ListSearch.vue";
 import { useRouter } from "vue-router";
+// @ts-ignore
+import { getQuestionList } from "../../api/question";
+// @ts-ignore
+import { useLoadQuestionListData } from "../../hooks/useLoadQuestionListData";
 
 const router = useRouter();
+const state = reactive({
+  questionList: [],
+});
+let loading = ref(true);
+let searchObj = {
+  keyword: router.currentRoute.value.query.keyword,
+};
+
+onMounted(async () => {
+  loading.value = true;
+  const data = await getQuestionList();
+  useLoadQuestionListData(searchObj);
+  state.questionList = data.list;
+  loading.value = false;
+});
 
 watch(
   () => router.currentRoute.value.query.keyword,
   (newPath, oldPath) => {
     if (newPath !== oldPath) {
-      search();
+      search(newPath);
     }
   },
   { immediate: true }
 );
 
-const questionList = reactive([
-  {
-    _id: "q1",
-    title: "问卷1",
-    isPublished: true,
-    isStar: false,
-    answerCount: 5,
-    createdAt: "3月10日 13:11",
-  },
-  {
-    _id: "q2",
-    title: "问卷2",
-    isPublished: false,
-    isStar: false,
-    answerCount: 3,
-    createdAt: "3月12日 13:21",
-  },
-  {
-    _id: "q3",
-    title: "问卷3",
-    isPublished: true,
-    isStar: true,
-    answerCount: 5,
-    createdAt: "3月22日 13:41",
-  },
-  {
-    _id: "q4",
-    title: "问卷4",
-    isPublished: false,
-    isStar: false,
-    answerCount: 4,
-    createdAt: "3月14日 14:11",
-  },
-]);
-
-function search() {
-  console.log("触发搜索");
+function search(newPath: any) {
+  searchObj = {
+    keyword: newPath,
+  };
+  useLoadQuestionListData(searchObj);
 }
 </script>
 

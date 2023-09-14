@@ -1,6 +1,6 @@
 <template>
   <div class="question-layout">
-    <h2>question-layout</h2>
+    <router-view></router-view>
   </div>
 </template>
 

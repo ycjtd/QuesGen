@@ -19,7 +19,7 @@ import { useRouter } from "vue-router";
 
 const router = useRouter();
 
-function toManagerList() {
+async function toManagerList() {
   router.push("/manage/list");
 }
 </script>

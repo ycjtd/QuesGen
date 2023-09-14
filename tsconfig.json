@@ -26,6 +26,6 @@
     "src/**/*.tsx",
     "src/**/*.vue",
     "src/router/index.js"
-  ],
+, "src/hooks/useLoadQuestionListData.js"  ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

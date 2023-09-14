@@ -8,14 +8,14 @@
         <ListSearch />
       </div>
     </div>
-    <div class="content">
-      <div v-if="questionList.length === 0">
+    <div class="content" v-loading="loading">
+      <div v-if="state.questionList.length === 0">
         <el-empty description="暂无数据" />
       </div>
       <div v-else>
         <el-button class="clear-all" @click="clearAll">清空回收站</el-button>
         <el-table
-          :data="questionList"
+          :data="state.questionList"
           style="width: 100%"
           border
           :cell-style="{ textAlign: 'center' }"
@@ -59,51 +59,49 @@
 </template>
 
 <script setup lang="ts">
-import { reactive } from "vue";
+import { reactive, ref, onMounted, watch } from "vue";
 import ListSearch from "../../components/ListSearch.vue";
+import { useRouter } from "vue-router";
+// @ts-ignore
+import { useLoadQuestionListData } from "../../hooks/useLoadQuestionListData";
+// @ts-ignore
+import { getQuestionList } from "../../api/question";
 
-let questionList = reactive([
-  {
-    _id: "q1",
-    title: "问卷1",
-    isPublished: true,
-    isStar: false,
-    answerCount: 5,
-    createdAt: "3月10日 13:11",
+const router = useRouter();
+const state = reactive({
+  questionList: [],
+});
+let loading = ref(true);
+let searchObj = {
+  keyword: router.currentRoute.value.query.keyword,
+  isDeleted: true,
+};
+
+onMounted(async () => {
+  loading.value = true;
+  const data = await getQuestionList();
+  useLoadQuestionListData(searchObj);
+  state.questionList = data.list;
+  loading.value = false;
+});
+
+watch(
+  () => router.currentRoute.value.query.keyword,
+  (newPath, oldPath) => {
+    if (newPath !== oldPath) {
+      search(newPath);
+    }
   },
-  {
-    _id: "q2",
-    title: "问卷2",
-    isPublished: false,
-    isStar: false,
-    answerCount: 3,
-    createdAt: "3月12日 13:21",
-  },
-  {
-    _id: "q3",
-    title: "问卷3",
-    isPublished: true,
-    isStar: false,
-    answerCount: 5,
-    createdAt: "3月22日 13:41",
-  },
-  {
-    _id: "q4",
-    title: "问卷4",
-    isPublished: true,
-    isStar: false,
-    answerCount: 5,
-    createdAt: "3月22日 13:41",
-  },
-  {
-    _id: "q5",
-    title: "问卷5",
-    isPublished: true,
-    isStar: false,
-    answerCount: 5,
-    createdAt: "3月22日 13:41",
-  },
-]);
+  { immediate: true }
+);
+
+function search(newPath: any) {
+  searchObj = {
+    isDeleted: true,
+    keyword: newPath,
+  };
+  useLoadQuestionListData(searchObj);
+}
 
 // 恢复
 function refresh(scope: any) {
@@ -119,7 +117,7 @@ function remove(scope: any) {
 
 // 清空回收站
 function clearAll() {
-  questionList.length = 0;
+  state.questionList.length = 0;
 }
 </script>
 

@@ -6,12 +6,12 @@
       </div>
       <div class="right"><ListSearch /></div>
     </div>
-    <div class="content">
-      <div v-if="questionList.length === 0">
+    <div class="content" v-loading="loading">
+      <div v-if="state.questionList.length === 0">
         <el-empty description="暂无数据" />
       </div>
       <div v-else>
-        <div v-for="item in questionList" :key="item._id">
+        <div v-for="item in state.questionList" :key="item._id">
           <QuestionCard :list="item" />
         </div>
       </div>
@@ -22,35 +22,49 @@
 
 <script setup lang="ts">
 import QuestionCard from "../../components/QuestionCard.vue";
-import { reactive } from "vue";
+import { reactive, ref, onMounted, watch } from "vue";
 import ListSearch from "../../components/ListSearch.vue";
+import { useRouter } from "vue-router";
+// @ts-ignore
+import { useLoadQuestionListData } from "../../hooks/useLoadQuestionListData";
+// @ts-ignore
+import { getQuestionList } from "../../api/question";
 
-const questionList = reactive([
-  {
-    _id: "q1",
-    title: "问卷1",
-    isPublished: true,
-    isStar: true,
-    answerCount: 5,
-    createdAt: "3月10日 13:11",
+const router = useRouter();
+const state = reactive({
+  questionList: [],
+});
+let loading = ref(true);
+let searchObj = {
+  keyword: router.currentRoute.value.query.keyword,
+  isStar: true,
+};
+
+onMounted(async () => {
+  loading.value = true;
+  const data = await getQuestionList();
+  useLoadQuestionListData(searchObj);
+  state.questionList = data.list;
+  loading.value = false;
+});
+
+watch(
+  () => router.currentRoute.value.query.keyword,
+  (newPath, oldPath) => {
+    if (newPath !== oldPath) {
+      search(newPath);
+    }
   },
-  {
-    _id: "q2",
-    title: "问卷2",
-    isPublished: false,
+  { immediate: true }
+);
+
+function search(newPath: any) {
+  searchObj = {
     isStar: true,
-    answerCount: 3,
-    createdAt: "3月12日 13:21",
-  },
-  {
-    _id: "q3",
-    title: "问卷3",
-    isPublished: true,
-    isStar: true,
-    answerCount: 5,
-    createdAt: "3月22日 13:41",
-  },
-]);
+    keyword: newPath,
+  };
+  useLoadQuestionListData(searchObj);
+}
 </script>
 
 <style scoped lang="less">

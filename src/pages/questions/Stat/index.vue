@@ -1,13 +1,19 @@
 <template>
-  <div class="Stat">
-    <h2>Stat</h2>
+  <div class="Edit">
+    <h2>{{ questionData.id }}</h2>
+    <h2>{{ questionData.title }}</h2>
   </div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+// @ts-ignore
+import { useGetQuestionData } from "../../../hooks/useLoadQuestionData";
+
+const { questionData } = useGetQuestionData();
+</script>
 
 <style scoped lang="less">
-.Stat {
+.Edit {
   color: red;
 }
 </style>

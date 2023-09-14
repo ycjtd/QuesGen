@@ -7,7 +7,7 @@
           @click="toDetail(list && list._id, list && list.isPublished)"
         >
           <el-icon
-            v-if="list && list.isStar"
+            v-if="list && !list.isStar"
             class="marginR"
             style="color: red; margin-right: 6px"
             ><Star
@@ -81,7 +81,7 @@ const props = defineProps({
 });
 const { list } = toRefs(props);
 
-function edit(id: any) {
+async function edit(id: any) {
   router.push(`/question/edit/${id}`);
 }
 

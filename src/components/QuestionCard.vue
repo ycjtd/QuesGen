@@ -7,7 +7,7 @@
           @click="toDetail(list && list._id, list && list.isPublished)"
         >
           <el-icon
-            v-if="list && !list.isStar"
+            v-if="isStar"
             class="marginR"
             style="color: red; margin-right: 6px"
             ><Star
@@ -51,17 +51,15 @@
         >
       </div>
       <div class="right">
-        <el-button size="small" type="text"
-          ><el-icon v-if="list && list.isStar" class="marginR"
-            ><Star
-          /></el-icon>
+        <el-button size="small" type="text" @click="handleStar(list._id)"
+          ><el-icon v-if="isStar" class="marginR"><Star /></el-icon>
           <el-icon v-else class="marginR"><StarFilled /></el-icon>
-          {{ list && list.isStar ? "取消标星" : "标星" }}</el-button
+          {{ isStar ? "取消标星" : "标星" }}</el-button
         >
-        <el-button size="small" type="text"
+        <el-button size="small" type="text" @click="handleCopy(list._id)"
           ><el-icon class="marginR"><CopyDocument /></el-icon>复制</el-button
         >
-        <el-button size="small" type="text"
+        <el-button size="small" type="text" @click="handleDelete(list._id)"
           ><el-icon class="marginR"><Delete /></el-icon>删除</el-button
         >
       </div>
@@ -70,8 +68,12 @@
 </template>
 
 <script setup lang="ts">
-import { toRefs } from "vue";
+// @ts-nocheck
+
+import { toRefs, ref } from "vue";
 import { useRouter } from "vue-router";
+import { updateQuestionService, copyQuestionService } from "../api/question";
+import { ElMessage } from "element-plus";
 
 const router = useRouter();
 
@@ -80,6 +82,38 @@ const props = defineProps({
   list: Object,
 });
 const { list } = toRefs(props);
+let isStar = ref(list.isStar);
+
+// 标星/取消标星
+const handleStar = async (id) => {
+  const data = await updateQuestionService(id);
+  isStar.value = !isStar.value;
+  ElMessage({
+    message: "修改成功",
+    type: "success",
+  });
+};
+
+// 复制
+const handleCopy = async (id) => {
+  const data = await copyQuestionService(id);
+  ElMessage({
+    message: "复制成功",
+    type: "success",
+  });
+  // 跳转到问卷编辑页
+  router.push(`/question/edit/${id}`);
+};
+
+// 删除问卷
+const handleDelete = async (id) => {
+  const data = await updateQuestionService(id, { idDeleted: true });
+
+  ElMessage({
+    message: "删除成功",
+    type: "success",
+  });
+};
 
 async function edit(id: any) {
   router.push(`/question/edit/${id}`);

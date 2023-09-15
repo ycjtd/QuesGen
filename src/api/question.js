@@ -27,3 +27,17 @@ export async function getQuestionList(searchOption = {}) {
   });
   return data;
 }
+
+// 修改单个问卷信息
+export async function updateQuestionService(id, opt) {
+  let url = `/api/question/${id}`;
+  const { data } = await ajax.patch(url, opt);
+  return data;
+}
+
+// 复制信息
+export async function copyQuestionService(id) {
+  let url = `/api/question/duplicate/${id}`;
+  const { data } = await ajax.post(url);
+  return data;
+}

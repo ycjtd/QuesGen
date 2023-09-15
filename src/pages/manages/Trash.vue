@@ -54,7 +54,17 @@
         </el-table>
       </div>
     </div>
-    <div class="footer">分页</div>
+    <div class="footer">
+      <el-pagination
+        background
+        layout="prev, pager, next"
+        :total="100"
+        :current-page="currentPage"
+        @update:current-page="handleCurrentPageChange"
+        @prev-click="handlePrevClick"
+        @next-click="handleNextClick()"
+      />
+    </div>
   </div>
 </template>
 
@@ -72,15 +82,23 @@ const state = reactive({
   questionList: [],
 });
 let loading = ref(true);
+let currentPage = ref(
+  // @ts-ignore
+  parseInt(router.currentRoute.value.query.page || "") || 1
+);
+
 let searchObj = {
-  keyword: router.currentRoute.value.query.keyword,
+  keyword: router.currentRoute.value.query.keyword || "",
+  // @ts-ignore
+  page: parseInt(router.currentRoute.value.query.page || "") || 1,
+  // @ts-ignore
+  pageSize: parseInt(router.currentRoute.value.query.pageSize || ""),
   isDeleted: true,
 };
 
 onMounted(async () => {
   loading.value = true;
-  const data = await getQuestionList();
-  useLoadQuestionListData(searchObj);
+  const data = await useLoadQuestionListData(searchObj);
   state.questionList = data.list;
   loading.value = false;
 });
@@ -96,12 +114,29 @@ watch(
 );
 
 function search(newPath: any) {
+  // @ts-ignore
   searchObj = {
     isDeleted: true,
     keyword: newPath,
   };
   useLoadQuestionListData(searchObj);
 }
+
+// 点击上一页
+const handlePrevClick = () => {
+  console.log("handlePrevClick");
+};
+
+// 点击下一页
+const handleNextClick = () => {
+  console.log("handleNextClick");
+};
+
+// 页数发生变化
+const handleCurrentPageChange = (val: number) => {
+  console.log("handleCurrentPageChange", val);
+  currentPage.value = val;
+};
 
 // 恢复
 function refresh(scope: any) {
@@ -146,7 +181,10 @@ function clearAll() {
 }
 
 .footer {
+  margin-top: 10px;
   text-align: center;
+  display: flex;
+  justify-content: center;
 }
 
 .pointer-style {
